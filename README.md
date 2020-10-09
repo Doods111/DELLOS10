@@ -1,6 +1,7 @@
 # Vagrant for Dell OS10
 This is an initial draft.
-Tested with: 
+Tested with:
+   * Ubuntu 
    * ansible 2.9.13
    * python 3.6
    * vagrant 2.2.3
