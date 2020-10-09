@@ -3,6 +3,7 @@ This is an initial draft.
 
 ## Step by step procedure to set up the environment: 
 1. Clone the project
+   * *git clone https://github.com/Doods111/DELLOS10.git*
 2. Add the vagrant OS10 box.
    * *vagrant box add --name os10 os10.box*
 3. Edit the ./group_vars/all.yaml file and enter the number of spines and leaves you need in your test environment (Consider the host memory and CPU available)
