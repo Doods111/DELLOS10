@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Building inventory file
+      template:
+        src=template/inventory.j2
+        dest=./inventory
+

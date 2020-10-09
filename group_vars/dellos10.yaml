@@ -1,0 +1,7 @@
+# parametes for connection type network_cli
+ansible_ssh_user: admin
+ansible_ssh_pass: admin
+ansible_network_os: dellos10
+ansible_connection: network_cli
+ansible_python_interpreter: /home/doods/opt/mypy/bin/python
+ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"

@@ -1,0 +1,40 @@
+--- 
+- hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Building Vagrant file
+      template:
+        src=template/Vagrantfile.j2
+        dest=./Vagrantfile
+
+
+- hosts: spines
+  connection: local
+  gather_facts: no
+  
+  tasks:
+    - name: Building Spines configs
+      template:
+        src=template/spine.j2
+        dest=host_vars/{{inventory_hostname}}.yaml
+  
+
+- hosts: leaves
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Building Leaves configs
+      template:
+        src=template/leaf.j2
+        dest=host_vars/{{inventory_hostname}}.yaml
+        
+        
+#- hosts: localhost
+#  gather_facts: false
+#  tasks:
+#  - name: running vagrant
+#    command: vagrant up
+#    register: commandoutput
+#  - debug: msg="{{commandoutput}}"

@@ -1,0 +1,131 @@
+hostname: spine1
+build_dir: "../temp/dellos10"
+ 
+dellos_system: 
+    hostname: spine1
+ 
+ 
+dellos_interface:
+   ethernet 1/1/1:
+      desc: "Connected to leaf1"
+      switchport: False
+      admin: up
+      ip_and_mask: 172.16.0.0/31
+   ethernet 1/1/2:
+      desc: "Connected to leaf2"
+      switchport: False
+      admin: up
+      ip_and_mask: 172.16.0.2/31
+   ethernet 1/1/3:
+      desc: "Connected to leaf3"
+      switchport: False
+      admin: up
+      ip_and_mask: 172.16.0.4/31
+   loopback 0:
+      ip_and_mask: 10.0.0.1/32
+
+dellos_bgp:
+##    state: absent
+    asn: 10
+    router_id: 10.0.0.1
+    neighbor:
+      - ip: 172.16.0.1
+        type: ipv4
+        remote_asn: 11
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        admin: up
+        state: present
+
+      - ip: 10.0.0.3
+        type: ipv4
+        remote_asn: 11
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        src_loopback: 0
+        src_loopback_state: present
+        send_community:
+           - type: extended
+           - state: present
+        address_family: 
+           - type: ipv4
+             activate: false
+           - type: l2vpn
+             activate: true
+        admin: up
+        state: present      
+      - ip: 172.16.0.3
+        type: ipv4
+        remote_asn: 12
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        admin: up
+        state: present
+
+      - ip: 10.0.0.4
+        type: ipv4
+        remote_asn: 12
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        src_loopback: 0
+        src_loopback_state: present
+        send_community:
+           - type: extended
+           - state: present
+        address_family: 
+           - type: ipv4
+             activate: false
+           - type: l2vpn
+             activate: true
+        admin: up
+        state: present      
+      - ip: 172.16.0.5
+        type: ipv4
+        remote_asn: 13
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        admin: up
+        state: present
+
+      - ip: 10.0.0.5
+        type: ipv4
+        remote_asn: 13
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        src_loopback: 0
+        src_loopback_state: present
+        send_community:
+           - type: extended
+           - state: present
+        address_family: 
+           - type: ipv4
+             activate: false
+           - type: l2vpn
+             activate: true
+        admin: up
+        state: present      
+     
+    redistribute:
+      - route_type: connected
+        address_type: ipv4
+        state: present
+#============================================================
+

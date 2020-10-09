@@ -1,0 +1,5 @@
+hostname: dellos10_sw1
+
+# parametes for connection type network_cli
+ansible_network_os: dellos10
+

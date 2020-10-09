@@ -1,0 +1,173 @@
+hostname: leaf3
+build_dir: ../temp/dellos10
+
+
+dellos_system: 
+    hostname: leaf3
+ 
+
+dellos_interface:
+   ethernet 1/1/1:
+      desc: "Connected to spine1"
+      switchport: False
+      admin: up
+      ip_and_mask: 172.16.0.5/31
+   ethernet 1/1/2:
+      desc: "Connected to spine2"
+      switchport: False
+      admin: up
+      ip_and_mask: 172.16.0.11/31
+   loopback 0:
+      ip_and_mask: 10.0.0.5/32
+
+dellos_bgp:
+##    state: absent
+    asn: 13
+    router_id: 10.0.0.5
+    neighbor:
+  
+      - ip: 172.16.0.4
+        type: ipv4
+        remote_asn: 10
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        admin: up
+        state: present
+#============================================================
+      - ip: 10.0.0.1
+        type: ipv4
+        remote_asn: 10
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        src_loopback: 0
+        src_loopback_state: present
+        send_community:
+           - type: extended
+           - state: present
+        address_family: 
+           - type: ipv4
+             activate: false
+           - type: l2vpn
+             activate: true
+        admin: up
+        state: present
+  
+      - ip: 172.16.0.10
+        type: ipv4
+        remote_asn: 10
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        admin: up
+        state: present
+#============================================================
+      - ip: 10.0.0.2
+        type: ipv4
+        remote_asn: 10
+        timer: 3 9
+        adv_interval: 40
+        fall_over: present
+        default_originate: False
+        sender_loop_detect: false
+        src_loopback: 0
+        src_loopback_state: present
+        send_community:
+           - type: extended
+           - state: present
+        address_family: 
+           - type: ipv4
+             activate: false
+           - type: l2vpn
+             activate: true
+        admin: up
+        state: present
+     
+    redistribute:
+      - route_type: connected
+        address_type: ipv4
+        state: present
+
+dellos_vlan:
+    vlan 2000:
+      description: "VNI2000"
+      untagged_members:
+        - port: ethernet 1/1/3
+          state: present
+      state: present
+  
+dellos_vxlan:
+    anycast_gateway_mac: "00:22:33:44:55:33"
+    loopback:
+      loopback_id: 10
+      description: "HARDWARE_VXLAN"
+      ip_address: "10.10.0.5/32"
+      state: "present"
+    nve:
+      source_interface: 0
+      state: "present"
+    evpn:
+      autoevi: False
+      evi:
+        - id: 2000
+          rd: 10.0.0.5:2000
+          vni:
+            id: 2000
+            state: "present"
+          route_target:
+            - type: "manual"
+              asn_value: "2000:2000"
+              route_target_type: "both"
+              state: "present"
+          state: "present"
+          
+
+      vrf:
+        - name: "test"
+          state: "present"      
+#          vni: 2000
+#          adv_ipv4:
+#           - type: "connected"
+#             state: "present"
+#           - type: "bgp"
+#             state: "present"
+#         route_target:
+#           - type: "manual"
+#             asn_value: "65530:65534"
+#             route_target_type: "both"
+#             state: "present"
+    rmac: 00:11:11:11:11:11
+    dis_rt_asn: "true"
+    virtual_network:
+#      untagged_vlan: 2000
+      virtual_net:
+        - id: 2000
+#          description: "To host"
+#          vlt_vlan_id: 11
+#          member_interface:
+#            - ifname: "ethernet 1/1/3"
+#              type: "untagged"
+#              vlanid: 2000
+#              state: "present"
+          vxlan_vni:
+           id: 2000
+          state: "present" 
+    vlan_association:
+      - vlan_id: 2000
+        virtual_net: 2000
+
+
+dellos_vrf:
+    vrfdetails:
+      - vrf_name: "test" 
+        state: "present"
+        
+        
+        

@@ -1,0 +1,22 @@
+---     
+- hosts: dellos10
+  gather_facts: false
+  roles:
+     - Dell-Networking.dellos-system 
+     - Dell-Networking.dellos-interface
+     - Dell-networking.dellos-bgp
+     - Dell-networking.dellos-vlan
+     - Dell-networking.dellos-vrf 
+     - Dell-Networking.dellos_vxlan 
+
+  tasks:
+  - name: "Save and backup configs"
+    dellos10_config:
+      save: yes
+      backup: yes
+      backup_options:
+        filename: "{{inventory_hostname}}.cfg"
+        dir_path: ./backup
+
+
+    
