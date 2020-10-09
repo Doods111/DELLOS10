@@ -10,6 +10,7 @@ Tested with:
    * *git clone https://github.com/Doods111/DELLOS10.git*
 2. Add the vagrant OS10 box.
    * *vagrant box add --name os10 os10.box*
+   * *sudo cp  ~/.vagrant.d/boxes/os10/0/libvirt/OS10-Disk-1.0.0.vmdk /var/lib/libvirt/images/*
 3. Edit the ./group_vars/all.yaml file and enter the number of spines and leaves you need in your test environment (Consider the host memory and CPU available)
 4. Run the generate_inventory.yaml playbook
    * *ansible-playbook generate_inventory.yaml*
