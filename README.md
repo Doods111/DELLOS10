@@ -4,6 +4,7 @@ Tested with:
    * ansible 2.9.13
    * python 3.6
    * vagrant 2.2.3
+      * *VER="2.2.3" ; wget https://releases.hashicorp.com/vagrant/${VER}/vagrant_${VER}_x86_64.deb ; sudo dpkg -i vagrant_${VER}_x86_64.deb*
 
 ## Step by step procedure to set up the environment: 
 1. Clone the project
