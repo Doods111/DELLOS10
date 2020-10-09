@@ -3,7 +3,7 @@ This is an initial draft.
 Tested with: 
    * ansible 2.9.13
    * python 3.6
-   * vagrant 2.2.9
+   * vagrant 2.2.3
 
 ## Step by step procedure to set up the environment: 
 1. Clone the project
