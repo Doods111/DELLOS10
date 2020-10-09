@@ -1,7 +1,7 @@
 # Vagrant for Dell OS10
 This is an initial draft.
 
-## Step by step procedure to run the script: 
+## Step by step procedure to set up the environment: 
 1. Clone the project
 2. Add the vagrant OS10 box.
    * *vagrant box add --name os10 os10.box*
