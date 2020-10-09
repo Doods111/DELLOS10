@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 # DELLOS10
+TEST
 =======
 # DELLOS10
->>>>>>> 748d137d24a1924deeb28cbb61926d95011dd822
-TEST 
+>>>>>>>
+ 
