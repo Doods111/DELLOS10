@@ -1,3 +1,6 @@
+
+
+
 hostname: leaf2
 build_dir: ../temp/dellos10
 
@@ -19,13 +22,36 @@ dellos_interface:
       ip_and_mask: 172.16.0.9/31
    loopback 0:
       ip_and_mask: 10.0.0.4/32
+ 
+   virtual-network 1400:
+      vrf: DEV
+      desc: "virtual-network interface"
+      ip_and_mask: "10.40.10.2/24"
+#      virtual_gateway_ip: "10.40.10.2"
+      admin: up
+ 
+   virtual-network 1500:
+      vrf: DEV
+      desc: "virtual-network interface"
+      ip_and_mask: "10.50.10.2/24"
+#      virtual_gateway_ip: "10.50.10.2"
+      admin: up
+ 
+   virtual-network 1600:
+      vrf: DEV
+      desc: "virtual-network interface"
+      ip_and_mask: "10.60.10.2/24"
+#      virtual_gateway_ip: "10.60.10.2"
+      admin: up
+
+
 
 dellos_bgp:
 ##    state: absent
     asn: 12
     router_id: 10.0.0.4
     neighbor:
-  
+ 
       - ip: 172.16.0.2
         type: ipv4
         remote_asn: 10
@@ -57,7 +83,7 @@ dellos_bgp:
              activate: true
         admin: up
         state: present
-  
+ 
       - ip: 172.16.0.8
         type: ipv4
         remote_asn: 10
@@ -96,12 +122,28 @@ dellos_bgp:
         state: present
 
 dellos_vlan:
-    vlan 2000:
-      description: "VNI2000"
+    
+    vlan 1400:
+      description: "VNI1400"
       untagged_members:
         - port: ethernet 1/1/3
           state: present
       state: present
+    
+    vlan 1500:
+      description: "VNI1500"
+      untagged_members:
+        - port: ethernet 1/1/4
+          state: present
+      state: present
+    
+    vlan 1600:
+      description: "VNI1600"
+      untagged_members:
+        - port: ethernet 1/1/5
+          state: present
+      state: present
+     
   
 dellos_vxlan:
     anycast_gateway_mac: "00:22:33:44:55:22"
@@ -113,61 +155,166 @@ dellos_vxlan:
     nve:
       source_interface: 0
       state: "present"
+    rmac: 00:11:11:11:11:11
     evpn:
       autoevi: False
       evi:
-        - id: 2000
-          rd: 10.0.0.4:2000
+    
+        - id: 1400
+          rd: 10.0.0.4:1400
           vni:
-            id: 2000
+            id: 1400
             state: "present"
           route_target:
             - type: "manual"
-              asn_value: "2000:2000"
+              asn_value: "1400:1400"
               route_target_type: "both"
               state: "present"
           state: "present"
+    
+        - id: 1500
+          rd: 10.0.0.4:1500
+          vni:
+            id: 1500
+            state: "present"
+          route_target:
+            - type: "manual"
+              asn_value: "1500:1500"
+              route_target_type: "both"
+              state: "present"
+          state: "present"
+    
+        - id: 1600
+          rd: 10.0.0.4:1600
+          vni:
+            id: 1600
+            state: "present"
+          route_target:
+            - type: "manual"
+              asn_value: "1600:1600"
+              route_target_type: "both"
+              state: "present"
+          state: "present"
+     
           
 
       vrf:
-        - name: "test"
+        - name: DEV
           state: "present"      
-#          vni: 2000
-#          adv_ipv4:
-#           - type: "connected"
-#             state: "present"
-#           - type: "bgp"
-#             state: "present"
-#         route_target:
-#           - type: "manual"
-#             asn_value: "65530:65534"
-#             route_target_type: "both"
-#             state: "present"
-    rmac: 00:11:11:11:11:11
-    dis_rt_asn: "true"
-    virtual_network:
-#      untagged_vlan: 2000
-      virtual_net:
-        - id: 2000
-#          description: "To host"
-#          vlt_vlan_id: 11
-#          member_interface:
-#            - ifname: "ethernet 1/1/3"
-#              type: "untagged"
-#              vlanid: 2000
-#              state: "present"
-          vxlan_vni:
-           id: 2000
-          state: "present" 
-    vlan_association:
-      - vlan_id: 2000
-        virtual_net: 2000
+          vni: 10000
+          adv_ipv4:
+           - type: "connected"
+             state: "present"
+           - type: "bgp"
+             state: "present"
+          route_target:
+           - type: "manual"
+             asn_value: "65530:10"
+             route_target_type: "both"
+             state: "present"
+        - name: NET
+          state: "present"      
+          vni: 11000
+          adv_ipv4:
+           - type: "connected"
+             state: "present"
+           - type: "bgp"
+             state: "present"
+          route_target:
+           - type: "manual"
+             asn_value: "65530:11"
+             route_target_type: "both"
+             state: "present"
+        - name: APP
+          state: "present"      
+          vni: 12000
+          adv_ipv4:
+           - type: "connected"
+             state: "present"
+           - type: "bgp"
+             state: "present"
+          route_target:
+           - type: "manual"
+             asn_value: "65530:12"
+             route_target_type: "both"
+             state: "present"
+        - name: DB
+          state: "present"      
+          vni: 13000
+          adv_ipv4:
+           - type: "connected"
+             state: "present"
+           - type: "bgp"
+             state: "present"
+          route_target:
+           - type: "manual"
+             asn_value: "65530:13"
+             route_target_type: "both"
+             state: "present"
+        - name: WEB
+          state: "present"      
+          vni: 14000
+          adv_ipv4:
+           - type: "connected"
+             state: "present"
+           - type: "bgp"
+             state: "present"
+          route_target:
+           - type: "manual"
+             asn_value: "65530:14"
+             route_target_type: "both"
+             state: "present"
+     
 
+    dis_rt_asn: "true"
+
+    virtual_network:
+      virtual_net:
+    
+        - id: 1400
+          vxlan_vni:
+           id: 1400
+          state: "present" 
+    
+        - id: 1500
+          vxlan_vni:
+           id: 1500
+          state: "present" 
+    
+        - id: 1600
+          vxlan_vni:
+           id: 1600
+          state: "present" 
+ 
+    vlan_association:
+    
+      - vlan_id: 1400
+        virtual_net: 1400
+    
+      - vlan_id: 1500
+        virtual_net: 1500
+    
+      - vlan_id: 1600
+        virtual_net: 1600
+ 
 
 dellos_vrf:
     vrfdetails:
-      - vrf_name: "test" 
+    
+      - vrf_name: DEV 
         state: "present"
-        
+    
+      - vrf_name: NET 
+        state: "present"
+    
+      - vrf_name: APP 
+        state: "present"
+    
+      - vrf_name: DB 
+        state: "present"
+    
+      - vrf_name: WEB 
+        state: "present"
+           
         
         

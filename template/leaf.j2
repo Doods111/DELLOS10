@@ -1,3 +1,10 @@
+{% set my_vrf_names = ["DEV","NET","APP","DB","WEB"] %}
+
+{% set nb_vni = ((inventory_hostname.strip("leaf")| int )*nb)%}
+{% set start_vni = nb_vni - (nb -1) %}
+{% set nb_vni = nb_vni + 1 %}
+
+
 hostname: {{inventory_hostname}}
 build_dir: ../temp/dellos10
 
@@ -16,14 +23,23 @@ dellos_interface:
 {% endfor %}
    loopback 0:
       ip_and_mask: 10.0.0.{{ nb_spine+(inventory_hostname.strip("leaf")| int ) }}/32
+{% for my_vni in range(start_vni,nb_vni) %} 
+   virtual-network 1{{my_vni}}00:
+      vrf: {{my_vrf_names[0]}}
+      desc: "virtual-network interface"
+      ip_and_mask: "10.{{my_vni}}0.10.{{inventory_hostname.strip("leaf")}}/24"
+#      virtual_gateway_ip: "10.{{my_vni}}0.10.{{inventory_hostname.strip("leaf")}}"
+      admin: up
+{% endfor %}
+
+
 
 dellos_bgp:
 ##    state: absent
     asn: 1{{ (inventory_hostname.strip("leaf")| int ) }}
     router_id: 10.0.0.{{ nb_spine+(inventory_hostname.strip("leaf")| int ) }}
     neighbor:
-{% for i in range(nb_spine) %}
-  
+{% for i in range(nb_spine) %} 
       - ip: 172.16.0.{{ ((nb_leaf * nb_spine)*i)+(((inventory_hostname.strip("leaf")| int )-1)*nb_spine) }}
         type: ipv4
         remote_asn: 10
@@ -62,12 +78,14 @@ dellos_bgp:
         state: present
 
 dellos_vlan:
-    vlan 2000:
-      description: "VNI2000"
+{% for my_vni in range(start_vni,nb_vni) %}    
+    vlan 1{{my_vni}}00:
+      description: "VNI1{{my_vni}}00"
       untagged_members:
-        - port: ethernet 1/1/{{nb_spine+1}}
+        - port: ethernet 1/1/{{(nb_spine+1+my_vni)-start_vni}}
           state: present
       state: present
+{% endfor %}     
   
 dellos_vxlan:
     anycast_gateway_mac: "00:22:33:44:55:{{ inventory_hostname.strip("leaf")}}{{ inventory_hostname.strip("leaf")}}"
@@ -79,61 +97,63 @@ dellos_vxlan:
     nve:
       source_interface: 0
       state: "present"
+    rmac: 00:11:11:11:11:11
     evpn:
       autoevi: False
       evi:
-        - id: 2000
-          rd: 10.0.0.{{ nb_spine+(inventory_hostname.strip("leaf")| int ) }}:2000
+{% for my_vni in range(start_vni,nb_vni) %}    
+        - id: 1{{my_vni}}00
+          rd: 10.0.0.{{ nb_spine+(inventory_hostname.strip("leaf")| int ) }}:1{{my_vni}}00
           vni:
-            id: 2000
+            id: 1{{my_vni}}00
             state: "present"
           route_target:
             - type: "manual"
-              asn_value: "2000:2000"
+              asn_value: "1{{my_vni}}00:1{{my_vni}}00"
               route_target_type: "both"
               state: "present"
           state: "present"
+{% endfor %}     
           
 
       vrf:
-        - name: "test"
+{% for v in my_vrf_names %}
+        - name: {{v}}
           state: "present"      
-#          vni: 2000
-#          adv_ipv4:
-#           - type: "connected"
-#             state: "present"
-#           - type: "bgp"
-#             state: "present"
-#         route_target:
-#           - type: "manual"
-#             asn_value: "65530:65534"
-#             route_target_type: "both"
-#             state: "present"
-    rmac: 00:11:11:11:11:11
-    dis_rt_asn: "true"
-    virtual_network:
-#      untagged_vlan: 2000
-      virtual_net:
-        - id: 2000
-#          description: "To host"
-#          vlt_vlan_id: 11
-#          member_interface:
-#            - ifname: "ethernet 1/1/{{nb_spine+1}}"
-#              type: "untagged"
-#              vlanid: 2000
-#              state: "present"
-          vxlan_vni:
-           id: 2000
-          state: "present" 
-    vlan_association:
-      - vlan_id: 2000
-        virtual_net: 2000
+          vni: 1{{my_vrf_names.index(v)}}000
+          adv_ipv4:
+           - type: "connected"
+             state: "present"
+           - type: "bgp"
+             state: "present"
+          route_target:
+           - type: "manual"
+             asn_value: "65530:1{{my_vrf_names.index(v)}}"
+             route_target_type: "both"
+             state: "present"
+{% endfor %}     
 
+    dis_rt_asn: "true"
+
+    virtual_network:
+      virtual_net:
+{% for my_vni in range(start_vni,nb_vni) %}    
+        - id: 1{{my_vni}}00
+          vxlan_vni:
+           id: 1{{my_vni}}00
+          state: "present" 
+{% endfor %} 
+    vlan_association:
+{% for my_vni in range(start_vni,nb_vni) %}    
+      - vlan_id: 1{{my_vni}}00
+        virtual_net: 1{{my_vni}}00
+{% endfor %} 
 
 dellos_vrf:
     vrfdetails:
-      - vrf_name: "test" 
+{% for v in my_vrf_names %}    
+      - vrf_name: {{v}} 
         state: "present"
-        
+{% endfor %}           
         
         

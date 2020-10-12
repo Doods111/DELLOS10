@@ -1,14 +1,24 @@
 ---     
-- hosts: dellos10
+- hosts: spines
   gather_facts: false
   roles:
      - Dell-Networking.dellos-system 
      - Dell-Networking.dellos-interface
      - Dell-networking.dellos-bgp
-     - Dell-networking.dellos-vlan
-     - Dell-networking.dellos-vrf 
-     - Dell-Networking.dellos_vxlan 
 
+- hosts: leaves
+  gather_facts: false
+  roles:
+     - Dell-Networking.dellos-system
+     - Dell-networking.dellos-vrf
+     - Dell-Networking.dellos-interface
+     - Dell-networking.dellos-bgp
+     - Dell-networking.dellos-vlan
+     - Dell-Networking.dellos_vxlan
+
+
+- hosts: dellos10
+  gather_facts: false
   tasks:
   - name: "Save and backup configs"
     dellos10_config:
@@ -18,5 +28,3 @@
         filename: "{{inventory_hostname}}.cfg"
         dir_path: ./backup
 
-
-    

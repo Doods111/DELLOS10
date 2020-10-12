@@ -8,7 +8,8 @@
 VERSION="os10"
 SPINE = 2
 LEAF = 3
-SERVER_PER_SW = 1
+SERVER_PER_SW = 2
+nb_vni= 3
 Vagrant.configure("2") do |config|
   config.ssh.username = "admin"
   config.ssh.password = "admin"
@@ -100,8 +101,12 @@ Vagrant.configure("2") do |config|
                 :libvirt__tunnel_port => "#{leaf_sw + SPINE}111#{srvperswcount + SPINE}" ,
                 :libvirt__tunnel_ip => "127.1.1.#{leaf_sw + SPINE}"              
                 srv.ssh.insert_key = true
-                srv.vm.provision "shell",
-                    inline: "sudo ifconfig eth1 10.10.10.#{leaf_sw+srvperswcount-1}0/24" # ubuntu
+
+                srv.vm.provision "shell", inline: <<-SHELL
+                     sudo ifconfig eth1 10.#{(nb_vni*(leaf_sw-1))+srvperswcount}0.10.10/24
+                     sudo ip route add 10.0.0.0/8 via 10.#{(nb_vni*(leaf_sw-1))+srvperswcount}0.10.#{leaf_sw}
+                  SHELL
+
             end
         end
    end
